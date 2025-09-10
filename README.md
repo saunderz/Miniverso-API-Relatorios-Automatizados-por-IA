@@ -15,6 +15,7 @@ Aplicação robusta em **FastAPI** com foco em transcrição automática de arqu
 
 ## Arquitetura & Fluxo
 
+```mermaid
 graph TD
   A([🎤 Arquivo .wav]) --> B{{🚀 API FastAPI}}
   B --> C([📝 STT - faster-whisper])
@@ -22,6 +23,7 @@ graph TD
   C --> E[(📂 Logs JSONL)]
   D --> F[[📑 Templates Jinja2 + WeasyPrint]]
   F --> G([📊 Relatórios PDF])
+```
 
 **Componentes principais**:
 - `stt_server.py`: servidor FastAPI.
