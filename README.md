@@ -1,130 +1,141 @@
-# 🎙️ Miniverso STT + Relatórios
+# Miniverso STT + Relatórios
 
-Aplicação em **FastAPI** para:
-- Transcrição de áudio (**STT**) com [faster-whisper](https://github.com/SYSTRAN/faster-whisper);
-- Análise textual local via **Ollama** (LLM);
-- Geração de **relatórios PDF**:
-  - **Coletivo**: estatísticas agregadas de todos os áudios processados;
-  - **Individual**: transcrição + análise LLM de um único áudio.
+**Descrição**  
+Aplicação robusta em **FastAPI** com foco em transcrição automática de arquivos de áudio em **português brasileiro (pt‑BR)**. Inclui detecção de silêncio, segmentação, geração de timestamps, análises via LLM local (Ollama) e geração de relatórios PDF tanto coletivos quanto individuais.
 
 ---
 
-## 🚀 Funcionalidades
+## Funcionalidades
 
-- **/transcrever**: endpoint POST para enviar arquivos `.wav` e receber transcrição + análise JSON.
-- **/report/coletivo**: gera PDF agregado com métricas, gráficos e ranking.
-- **/report/individual/{id}**: gera PDF individual com transcrição e análise LLM do áudio selecionado.
-
-⚠️ **Somente arquivos WAV PCM 16-bit** são aceitos (mono ou estéreo, qualquer taxa; reamostrado para 16 kHz).
+- **/transcrever** (POST): aceita `.wav` (PCM 16‑bit), envia transcrição e análise JSON (texto, resumo, tópicos, sentimento, metadados).
+- **/report/coletivo**: gera PDF com métricas agregadas, gráficos e ranking de todos os áudios processados.
+- **/report/individual/{id}**: gera PDF com transcrição completa e análise LLM de um único áudio.
 
 ---
 
-## 📂 Estrutura
+## Arquitetura & Fluxo
 
+```mermaid
+graph LR
+  A[Arquivo .wav] --> B[API FastAPI]
+  B --> C[Segmentação / STT (faster‑whisper)]
+  C --> D[Análise via LLM (Ollama)]
+  C --> E[logs JSONL]
+  D --> F[Templates Jinja2 + WeasyPrint]
+  F --> G[PDF Relatórios (Coletivo / Individual)]
 ```
-.
-├── stt_server.py                  # Servidor FastAPI
-├── reports/
-│   ├── audio_report.py            # Funções para gerar relatórios
-│   ├── data/                      # Onde ficam os .jsonl das transcrições
-│   │   └── stt_runs.jsonl
-│   ├── output/                    # PDFs gerados
-│   ├── static/
-│   │   ├── charts/                # Gráficos gerados em PNG
-│   │   └── miniverso/             # Logos (logo-horizontal.png, isotipo.png)
-│   └── templates/
-│       ├── audio_report_telemetry_like.html   # Template coletivo
-│       └── audio_report_individual.html       # Template individual
-```
+
+**Componentes principais**:
+- `stt_server.py`: servidor FastAPI.
+- `audio_report.py`: lógica de geração de relatórios.
+- `reports/data/stt_runs.jsonl`: base de transcrições.
+- `reports/static/charts/`: gráficos em PNG.
+- `reports/templates/`: templates HTML para geração dos PDFs.
+- `reports/output/`: relatórios finais em PDF.
 
 ---
 
-## 🛠️ Requisitos
+## Tecnologias & Dependências
 
-- Python 3.10+  
-- [ffmpeg](https://ffmpeg.org) **não é necessário** (WAV puro apenas)
-- Dependências Python:
-```bash
-pip install fastapi uvicorn faster-whisper numpy weasyprint jinja2 matplotlib python-multipart
-```
+- **Backend**: Python ≥ 3.10, FastAPI, Uvicorn
+- **Processamento de áudio**: faster‑whisper (com suporte a GPU), SpeechRecognition, Pydub
+- **Análise LLM local**: Ollama
+- **Geração de relatórios**: Jinja2, WeasyPrint, Matplotlib
+- **Outras dependências**: numpy, python‑multipart
 
-Para análise LLM:
-```bash
-pip install ollama
-```
-e instale o [Ollama](https://ollama.ai) localmente.
+**Ambiente**:
+- Formato suportado: WAV PCM 16‑bit (mono/estéreo), reamostrado para 16 kHz.
+- **Observe**: `ffmpeg` não é exigido.
 
 ---
 
-## ▶️ Como rodar
+## Demonstração (exemplos de uso)
 
-1. Clone o projeto e entre na pasta.
-2. Inicie o servidor:
-
+### Iniciar servidor
 ```bash
 uvicorn stt_server:app --host 0.0.0.0 --port 8001
 ```
 
-3. Acesse no navegador:
+### Verificar saúde
+Abra no navegador:
 ```
 http://localhost:8001/health
 ```
 
----
-
-## 🎧 Enviar áudio
-
-### Windows (PowerShell):
+### Transcrever áudio (Windows - PowerShell)
 ```powershell
-curl.exe -X POST "http://<IP_SERVIDOR>:8001/transcrever" -F "file=@C:/Users/User/Desktop/audio.wav" -F "language=pt" -F "speaker=Maria"
+curl.exe -X POST "http://<IP_SERVIDOR>:8001/transcrever" -F "file=@C:/caminho/audio.wav" -F "language=pt" -F "speaker=Maria"
 ```
 
-### Linux/macOS:
+### Transcrever áudio (Linux/macOS)
 ```bash
-curl -X POST "http://<IP_SERVIDOR>:8001/transcrever" -F "file=@/home/user/audio.wav" -F "language=pt" -F "speaker=Maria"
+curl -X POST "http://<IP_SERVIDOR>:8001/transcrever"   -F "file=@/caminho/audio.wav"   -F "language=pt"   -F "speaker=Maria"
 ```
 
-Retorno JSON (exemplo):
+**Resposta JSON esperada**:
 ```json
 {
   "ok": true,
-  "id": "run-1757513801044",
-  "text": "texto transcrito...",
-  "analysis": {"summary":"...", "topics":["..."], "sentiment":"neutro"},
-  "meta": {"model":"medium","device":"cuda","compute_type":"float16"}
+  "id": "run‑1234567890",
+  "text": "...",
+  "analysis": {
+    "summary": "...",
+    "topics": ["..."],
+    "sentiment": "neutro"
+  },
+  "meta": {
+    "model": "medium",
+    "device": "cuda",
+    "compute_type": "float16"
+  }
 }
 ```
 
----
-
-## 📊 Relatórios
-
-- **Coletivo** (todos os áudios):
-  ```
-  http://<IP_SERVIDOR>:8001/report/coletivo
-  ```
-
-- **Individual** (um áudio específico):
-  ```
-  http://<IP_SERVIDOR>:8001/report/individual/{id}
-  ```
-
-onde `{id}` é o valor retornado no JSON do `/transcrever`.
+### Acessar relatórios (via navegador)
+- **Coletivo**: `http://<IP_SERVIDOR>:8001/report/coletivo`
+- **Individual**: `http://<IP_SERVIDOR>:8001/report/individual/{id}`
 
 ---
 
-## ✨ Exemplos de PDF
+## Exemplo Visual (opcional)
 
-- **Relatório coletivo**: métricas de duração, WPM, gráficos e ranking.
-- **Relatório individual**: metadados do áudio, transcrição completa, análise LLM (resumo, tópicos, sentimento).
+*(Aqui você pode inserir – idealmente como image link ou GIF – capturas dos PDFs gerados: gráficos, ranking, transcrição com análise LLM etc.)*
+
+---
+
+## Resultados e Métricas
+
+- Demonstra tempo médio de resposta da transcrição.
+- Precisão da transcrição.
+- Quantidade de áudios processados.
+- Insights extraídos: sentimento predominante, temas recorrentes, volume de palavras por minuto (WPM), etc.
 
 ---
 
-## 📌 Notas
+## Aplicações & Benefícios
 
-- Os dados das transcrições ficam salvos em `reports/data/stt_runs.jsonl`.
-- Os gráficos são gerados em `reports/static/charts/`.
-- Os PDFs finais ficam em `reports/output/`.
-- Caso a LLM retorne resposta inválida, o sistema aplica **fallback local** (resumo por heurística + tópicos por frequência).
+- **Alta escalabilidade**: processamento local ou com GPU.
+- **Apresentações analíticas**: PDFs prontos para relatórios corporativos ou acadêmicos.
+- **Modularidade**: arquitetura separada (STT, LLM, relatórios).
+- **Privacidade e Performance**: solução local sem depender de APIs externas.
 
 ---
+
+## Próximos passos sugeridos
+
+- Integrar modelos Whisper mais recentes ou especialização em sotaques regionais.
+- Adotar OAuth/JWT para segurança de endpoints.
+- Front-end web para interface visual (upload de áudio, visualização dos relatórios).
+- Exportar métricas para dashboards (Grafana / Kibana).
+
+---
+
+## Contato
+
+**Autor**: Luã Saunders — Engenheiro da Computação  
+**Contato**: [e-mail, LinkedIn, etc.]  
+**Status**: Projeto demonstrativo / R&D — código-fonte disponível sob solicitação ou protegido por NDA.
+
+---
+
+**Licença**: MIT (ou outra, conforme sua preferência)
