@@ -1,0 +1,1 @@
+# Miniverso-API-Relatorios-Automatizados-por-IA
