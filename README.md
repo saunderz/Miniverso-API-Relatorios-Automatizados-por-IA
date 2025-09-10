@@ -127,7 +127,7 @@ curl -X POST "http://<IP_SERVIDOR>:8001/transcrever"   -F "file=@/caminho/audio.
 ## Contato
 
 **Autor**: Luã Saunders — Engenheiro da Computação  
-**Contato**: saunders.luan@gmail.com | https://www.linkedin.com/in/lu%C3%A3-saunders/
+**Contato**: saunders.luan@gmail.com | https://www.linkedin.com/in/lu%C3%A3-saunders/  
 **Status**: Projeto demonstrativo / R&D — código-fonte disponível sob solicitação ou protegido por NDA.
 
 ---
