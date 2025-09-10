@@ -97,12 +97,6 @@ curl -X POST "http://<IP_SERVIDOR>:8001/transcrever"   -F "file=@/caminho/audio.
 
 ---
 
-## Exemplo Visual (opcional)
-
-*(Aqui você pode inserir – idealmente como image link ou GIF – capturas dos PDFs gerados: gráficos, ranking, transcrição com análise LLM etc.)*
-
----
-
 ## Resultados e Métricas
 
 - Demonstra tempo médio de resposta da transcrição.
@@ -133,9 +127,9 @@ curl -X POST "http://<IP_SERVIDOR>:8001/transcrever"   -F "file=@/caminho/audio.
 ## Contato
 
 **Autor**: Luã Saunders — Engenheiro da Computação  
-**Contato**: [e-mail, LinkedIn, etc.]  
+**Contato**: saunders.luan@gmail.com | https://www.linkedin.com/in/lu%C3%A3-saunders/
 **Status**: Projeto demonstrativo / R&D — código-fonte disponível sob solicitação ou protegido por NDA.
 
 ---
 
-**Licença**: MIT (ou outra, conforme sua preferência)
+**Licença**: MIT
