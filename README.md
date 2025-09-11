@@ -1,5 +1,12 @@
 # Miniverso STT + Relatórios
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![FastAPI](https://img.shields.io/badge/FastAPI-Framework-green)
+![Whisper](https://img.shields.io/badge/STT-faster--whisper-orange)
+![Ollama](https://img.shields.io/badge/LLM-Ollama-purple)
+![Status](https://img.shields.io/badge/Status-Ativo-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
 **Descrição**  
 Aplicação robusta em **FastAPI** com foco em transcrição automática de arquivos de áudio em **português brasileiro (pt‑BR)**. Inclui detecção de silêncio, segmentação, geração de timestamps, análises via LLM local (Ollama) e geração de relatórios PDF tanto coletivos quanto individuais.
 
